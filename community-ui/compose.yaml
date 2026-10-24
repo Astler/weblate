@@ -1,0 +1,73 @@
+# New/staging installation only. Do not attach existing production Weblate volumes
+# before verifying DB version, permissions, backups and application migrations.
+services:
+  weblate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        WEBLATE_BASE: ${WEBLATE_BASE:-weblate/weblate:2026.10.1.2}
+    image: weblate-community-ui:0.1.0
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /run
+      - /tmp
+    depends_on:
+      database:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    expose:
+      - '8080'
+    environment:
+      WEBLATE_DEBUG: '0'
+      WEBLATE_SITE_DOMAIN: ${WEBLATE_SITE_DOMAIN:?Set WEBLATE_SITE_DOMAIN}
+      WEBLATE_SITE_TITLE: ${WEBLATE_SITE_TITLE:-Community Translations}
+      WEBLATE_ALLOWED_HOSTS: ${WEBLATE_ALLOWED_HOSTS:?Set WEBLATE_ALLOWED_HOSTS}
+      WEBLATE_ENABLE_HTTPS: ${WEBLATE_ENABLE_HTTPS:-1}
+      WEBLATE_ADMIN_EMAIL: ${WEBLATE_ADMIN_EMAIL:?Set WEBLATE_ADMIN_EMAIL}
+      WEBLATE_SERVER_EMAIL: ${WEBLATE_SERVER_EMAIL:?Set WEBLATE_SERVER_EMAIL}
+      WEBLATE_DEFAULT_FROM_EMAIL: ${WEBLATE_DEFAULT_FROM_EMAIL:?Set WEBLATE_DEFAULT_FROM_EMAIL}
+      WEBLATE_REGISTRATION_OPEN: ${WEBLATE_REGISTRATION_OPEN:-1}
+      WEBLATE_EMAIL_HOST: ${WEBLATE_EMAIL_HOST:-127.0.0.1}
+      POSTGRES_HOST: database
+      POSTGRES_DB: weblate
+      POSTGRES_USER: weblate
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      REDIS_HOST: cache
+    volumes:
+      - weblate-data:/app/data
+      - weblate-cache:/app/cache
+    # Inherits health check from the upstream image: /app/bin/health_check.
+  database:
+    image: postgres:17.11-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: weblate
+      POSTGRES_USER: weblate
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U weblate -d weblate']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  cache:
+    image: valkey/valkey:9.1.2
+    restart: unless-stopped
+    read_only: true
+    command: ['valkey-server', '--save', '60', '1', '--loglevel', 'warning']
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'valkey-cli', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 10
+volumes:
+  weblate-data: {}
+  weblate-cache: {}
+  postgres-data: {}
+  redis-data: {}

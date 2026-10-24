@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+  <li class="breadcrumb-item"><a href="{% url 'projects' %}">{% translate "Projects" %}</a></li>
+{% endblock breadcrumbs %}
+{% block content %}
+  <section class="community-page-intro">
+    <p class="community-eyebrow">{% translate "Get involved" %}</p>
+    <h1>{% translate "Browse all projects" %}</h1>
+    <p>{% translate "Choose a project to explore its languages and translations." %}</p>
+    <label class="community-filter-label" for="community-project-filter">{% translate "Filter projects on this page" %}</label>
+    <input id="community-project-filter" class="form-control community-project-filter" type="search"
+           placeholder="{% translate 'Search projects' %}" autocomplete="off"
+           data-count-label="{% translate 'Projects' %}" aria-controls="community-project-grid" />
+    <p id="community-filter-status" class="visually-hidden" role="status" aria-live="polite"></p>
+  </section>
+  {% include "list-projects.html" with add_link="project" %}
+  <p id="community-filter-empty" class="community-empty" hidden>{% translate "No matching projects on this page" %}</p>
+  {% include "paginator.html" with page_obj=projects %}
+  {% if payment_enabled %}
+    <p><a href="{% url 'create-billing' %}?upgrade=1" class="btn btn-primary">{% translate "Purchase new hosting plan" %}</a></p>
+  {% elif offer_hosting %}
+    <p><a href="{% url 'hosting' %}" class="btn btn-primary">{% translate "Ask for project hosting" %}</a></p>
+  {% endif %}
+{% endblock content %}

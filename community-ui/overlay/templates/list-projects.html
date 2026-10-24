@@ -1,0 +1,35 @@
+{% load i18n permissions translations %}
+
+{% if projects %}
+  <div class="community-project-grid" id="community-project-grid">
+    {% for project in projects %}
+      <article class="community-project-card" data-project-name="{{ project.name|lower }}">
+        <div class="community-project-card-top">
+          <span class="community-project-mark" aria-hidden="true">{{ project.name|slice:':1'|upper }}</span>
+          <span class="community-project-percent">{{ project.stats.translated_percent|floatformat:0 }}%</span>
+        </div>
+        <h3><a href="{{ project.get_absolute_url }}">{{ project.name }}</a></h3>
+        {% if project.description %}
+          <p class="community-project-description">{{ project.description|striptags|truncatewords:20 }}</p>
+        {% else %}
+          <p class="community-project-description">{% translate "Help translate this project into more languages." %}</p>
+        {% endif %}
+        <div class="community-project-progress">
+          <progress value="{{ project.stats.translated_percent }}" max="100" aria-label="{% translate 'Translated' %}">{{ project.stats.translated_percent }}%</progress>
+          <div class="community-project-meta">
+            <span>{% translate "Unfinished" %}: {{ project.stats.todo }}</span>
+            <span>{% translate "Total strings" %}: {{ project.stats.all }}</span>
+          </div>
+        </div>
+        <a class="community-project-link" href="{{ project.get_absolute_url }}">{% translate "Browse" %} <span aria-hidden="true">→</span></a>
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="community-empty"><h3>{% translate "No projects found" %}</h3></div>
+{% endif %}
+{# All original stats, sorting, project creation, and permission-aware actions remain accessible. #}
+<details class="community-details" id="community-detailed-projects">
+  <summary>{% translate "Detailed statistics and actions" %}</summary>
+  {% include "snippets/list-objects.html" with objects=projects label=_("Project") show_admin_badge=True %}
+</details>

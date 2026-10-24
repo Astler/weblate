@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n translations %}
+
+{% block content %}
+  {% announcements %}
+  <section class="community-hero" aria-labelledby="community-hero-title">
+    <div class="community-hero-copy">
+      <p class="community-eyebrow">{% translate "Translations" %} / {% translate "Community" %}</p>
+      <h1 id="community-hero-title">{% translate "Help translate" %} {{ site_title }}</h1>
+      <p>{% translate "Select a project, choose a language, and help make it available to everyone." %}</p>
+      <div class="community-actions">
+        <a class="btn btn-primary btn-lg" href="{% url 'projects' %}">{% translate "Browse all projects" %}</a>
+        <a class="btn btn-outline-primary btn-lg" href="{% url 'languages' %}">{% translate "Browse all languages" %}</a>
+      </div>
+    </div>
+    <div class="community-hero-steps" aria-label="{% translate 'Getting started' %}">
+      <span><b>01</b> {% translate "Choose a project" %}</span>
+      <span><b>02</b> {% translate "Choose a language" %}</span>
+      <span><b>03</b> {% translate "Suggest a translation" %}</span>
+    </div>
+  </section>
+  <section class="community-section" aria-labelledby="community-projects-title">
+    <div class="community-section-header">
+      <div><p class="community-eyebrow">{% translate "Get involved" %}</p><h2 id="community-projects-title">{% translate "Projects" %}</h2></div>
+      <a href="{% url 'projects' %}">{% blocktranslate count count=all_projects %}Browse {{ count }} project{% plural %}Browse all {{ count }} projects{% endblocktranslate %} →</a>
+    </div>
+    {% include "list-projects.html" with projects=top_projects %}
+  </section>
+{% endblock content %}

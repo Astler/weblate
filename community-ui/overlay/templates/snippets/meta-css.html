@@ -1,0 +1,23 @@
+{% load static %}
+{# Upstream: weblate/templates/snippets/meta-css.html, weblate-2026.10.1 #}
+{% if LANGUAGE_BIDI %}
+  <link rel="stylesheet" href="{% static 'styles/vendor/bootstrap5_rtl.css' %}" />
+{% else %}
+  <link rel="stylesheet" href="{% static 'styles/vendor/bootstrap5.css' %}" />
+{% endif %}
+<link rel="stylesheet" href="{% static 'weblate_fonts/source-code-pro.css' %}" />
+<link rel="stylesheet" href="{% static 'weblate_fonts/source-sans-3.css' %}" />
+<link rel="stylesheet" href="{% static 'styles/vendor/tom-select.css' %}" />
+<link rel="stylesheet" href="{% static 'styles/variables.css' %}" />
+<link rel="stylesheet" href="{% static 'styles/main.css' %}" />
+<link rel="stylesheet" href="{% static 'styles/date-range-picker.css' %}" />
+{% if theme == "dark" %}
+  <link rel="stylesheet" href="{% static 'style-dark.css' %}" />
+{% elif theme != "light" %}
+  <link rel="stylesheet" href="{% static 'style-dark.css' %}" media="(prefers-color-scheme: dark)" />
+{% endif %}
+<link rel="stylesheet" href="{% static 'community-ui/theme.css' %}" />
+{% if custom_css_hash %}
+  <link rel="stylesheet" href="{% url "css-custom" %}?{{ custom_css_hash }}" />
+{% endif %}
+<script defer src="{% static 'community-ui/projects.js' %}"></script>

@@ -1,0 +1,9 @@
+.git
+.env
+.env.*
+!.env.example
+*.sql
+*.tar
+*.tar.gz
+backups
+__pycache__
